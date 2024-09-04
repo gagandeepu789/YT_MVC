@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using YT_MVC.Infrastructure.Data;
 namespace YT_MVC
 {
     public class Program
@@ -8,6 +10,8 @@ namespace YT_MVC
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<ApplicationDbContext>(option =>
+            option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
@@ -24,7 +28,7 @@ namespace YT_MVC
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Villa}/{action=Index}/{id?}");
 
             app.Run();
         }
