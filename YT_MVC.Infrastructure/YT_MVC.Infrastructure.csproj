@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\YT_MVC_Dll\YT_MVC.Domain.csproj" />
+    <ProjectReference Include="..\YT_MVC.Application\YT_MVC.Application.csproj" />
   </ItemGroup>
 
 </Project>

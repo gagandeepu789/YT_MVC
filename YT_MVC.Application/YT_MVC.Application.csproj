@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Interfaces\" />
+    <ProjectReference Include="..\YT_MVC_Dll\YT_MVC.Domain.csproj" />
   </ItemGroup>
 
 </Project>
