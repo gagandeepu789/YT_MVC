@@ -23,4 +23,8 @@
     <ProjectReference Include="..\YT_MVC.Infrastructure\YT_MVC.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\VillaImage\" />
+  </ItemGroup>
+
 </Project>

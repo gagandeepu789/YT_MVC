@@ -8,15 +8,17 @@ namespace YT_MVC.Controllers
 
     public class VillaController : Controller
     {
-        private readonly IVillaRepository _villaRepo;
-        public VillaController(IVillaRepository villaRepo)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public VillaController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
 
         {
-            _villaRepo =villaRepo;
+            _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
-            var villas= _villaRepo.GetAll();
+            var villas= _unitOfWork.Villa.GetAll();
             return View(villas);
         }
         public IActionResult Create()
@@ -32,17 +34,29 @@ namespace YT_MVC.Controllers
             }
             if (ModelState.IsValid)
             {
-               _villaRepo.Add(obj);
-                _villaRepo.Save();
+                if(obj.Image!=null)
+                {
+                    string filename=Guid.NewGuid().ToString()+Path.GetExtension(obj.Image.FileName);
+                    string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, @"Images\VillaImage");
+                    using var filestream = new FileStream(Path.Combine(imagePath, filename), FileMode.Create);
+                    obj.Image.CopyTo(filestream);
+                    obj.ImageUrl= @"Images\VillaImage\" + filename;
+                }
+                else
+                {
+                    obj.ImageUrl = "https://placehold.co/600x400";
+                }
+                _unitOfWork.Villa.Add(obj);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been created successfully";
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(obj);
+            return View();
         }
         public IActionResult Update(int villaid)
         {
-            Villa? obj= _villaRepo.Get(x => x.Id == villaid);
+            Villa? obj= _unitOfWork.Villa.Get(x => x.Id == villaid);
             if (obj == null)
             {
                 return RedirectToAction("Error","Home");
@@ -55,8 +69,8 @@ namespace YT_MVC.Controllers
          
             if (ModelState.IsValid && obj.Id>0)
             {
-                _villaRepo.Update(obj);
-                _villaRepo.Save();
+                _unitOfWork.Villa.Update(obj);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been Updated successfully";
 
                 return RedirectToAction(nameof(Index));
@@ -65,7 +79,7 @@ namespace YT_MVC.Controllers
         }
         public IActionResult Delete(int villaid)
         {
-            Villa? obj = _villaRepo.Get(x => x.Id == villaid);
+            Villa? obj = _unitOfWork.Villa.Get(x => x.Id == villaid);
             if (obj is null)
             {
                 return RedirectToAction("Error", "Home");
@@ -75,12 +89,12 @@ namespace YT_MVC.Controllers
         [HttpPost]
         public IActionResult Delete(Villa obj)
         {
-            Villa? objFromDb = _villaRepo.Get(u=>u.Id == obj.Id);
+            Villa? objFromDb = _unitOfWork.Villa.Get(u=>u.Id == obj.Id);
 
             if (objFromDb is not null)
             {
-                _villaRepo.Remove(objFromDb);
-                _villaRepo.Save();
+                _unitOfWork.Villa.Remove(objFromDb);
+                _unitOfWork.Save();
                 TempData["success"]="The villa has been deleted successfully";
                 return RedirectToAction("Index");
             }
